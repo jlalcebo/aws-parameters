@@ -3,6 +3,8 @@ AWS Parameters
 
 Provide objects for building request parameters to AWS low-level API.
 
+##### Example:
+
 ```php
 use Aws\DynamoDb\DynamoDbClient;
 use GTMC\Aws\Parameters\DynamoDB\Actions\CreateTable;
