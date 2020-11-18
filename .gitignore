@@ -1,0 +1,18 @@
+### JetBrains
+.idea/
+
+### Composer
+vendor/
+composer.lock
+composer.phar
+
+### VisualStudioCode
+.vscode/
+
+### phpDocumentor
+.phpdoc/
+
+### PHPUnit
+phpunit.xml
+.php_cs.cache
+.phpunit.result.cache
