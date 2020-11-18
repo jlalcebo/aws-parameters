@@ -81,7 +81,7 @@ abstract class Parameter implements JsonSerializable
     {
         foreach ($input as &$value) {
             if (is_array($value)) {
-                $value = $this->filterRecursive($value, $callback);
+                $value = $this->filterRecursive($value, $callback, $flag);
             }
         }
         return array_filter($input, $callback, $flag);
