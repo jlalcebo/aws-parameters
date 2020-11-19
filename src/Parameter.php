@@ -12,8 +12,8 @@ namespace GTMC\Aws\Parameters;
 
 use JsonSerializable;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionProperty;
+use Throwable;
 
 /**
  * This is the base class for all parameter classes.
@@ -36,7 +36,7 @@ abstract class Parameter implements JsonSerializable
      * Convert the current parameter into a plain PHP array.
      *
      * @return array
-     * @throws ReflectionException
+     * @throws Throwable
      */
     public function toArray(): array
     {
@@ -46,7 +46,7 @@ abstract class Parameter implements JsonSerializable
     /**
      * Specify data which should be serialized to JSON.
      *
-     * @throws ReflectionException
+     * @throws Throwable
      */
     public function jsonSerialize()
     {
@@ -56,10 +56,18 @@ abstract class Parameter implements JsonSerializable
                     ->getProperties(ReflectionProperty::IS_PUBLIC),
                 function ($carry, ReflectionProperty $item) {
                     $value = $this->{$item->name};
-                    $carry[ucfirst($item->name)] =
-                        $value instanceof JsonSerializable
-                            ? $value->jsonSerialize()
-                            : $value;
+
+                    if ($value instanceof JsonSerializable) {
+                        $value = $value->jsonSerialize();
+                    } elseif (is_array($value)) {
+                        foreach ($value as $key => $subItem) {
+                            if ($subItem instanceof JsonSerializable) {
+                                $value[$key] = $subItem->jsonSerialize();
+                            }
+                        }
+                    }
+
+                    $carry[ucfirst($item->name)] = $value;
                     return $carry;
                 }
             ),
