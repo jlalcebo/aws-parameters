@@ -6,45 +6,38 @@ Provide objects for building request parameters to AWS low-level API.
 ##### Example:
 
 ```php
-use Aws\DynamoDb\DynamoDbClient;
+use Aws\Sdk;
 use GTMC\Aws\Parameters\DynamoDB\Actions\CreateTable;
 use GTMC\Aws\Parameters\DynamoDB\DataTypes\AttributeDefinition;
 use GTMC\Aws\Parameters\DynamoDB\DataTypes\KeySchemaElement;
-use GTMC\Aws\Parameters\DynamoDB\DataTypes\LocalSecondaryIndex;
-use GTMC\Aws\Parameters\DynamoDB\DataTypes\Projection;
 use GTMC\Aws\Parameters\DynamoDB\DataTypes\ProvisionedThroughput;
 
+$sdk = new Sdk(
+    [
+        'endpoint' => 'http://localhost:8000',
+        'region' => 'us-west-2',
+        'version' => 'latest'
+    ]
+);
+
+$dynamoDb = $sdk->createDynamoDb();
 $createTable = new CreateTable(
     'Music',
     [
         new AttributeDefinition('Artist', AttributeDefinition::ATTRIBUTE_TYPE_S),
-        new AttributeDefinition('SongTitle', AttributeDefinition::ATTRIBUTE_TYPE_S),
-        new AttributeDefinition('AlbumYear', AttributeDefinition::ATTRIBUTE_TYPE_N),
+        new AttributeDefinition('SongTitle', AttributeDefinition::ATTRIBUTE_TYPE_S)
     ],
     [
         new KeySchemaElement('Artist', KeySchemaElement::KEY_TYPE_HASH),
         new KeySchemaElement('SongTitle', KeySchemaElement::KEY_TYPE_RANGE)
     ],
-    CreateTable::BILLING_MODE_PAY_PER_REQUEST,
     null,
-    [
-        new LocalSecondaryIndex(
-            'localIdx',
-            [
-            new KeySchemaElement('attName', KeySchemaElement::KEY_TYPE_RANGE)
-            ],
-            new Projection(
-                ['Artist'],
-                Projection::PROJECTION_TYPE_KEYS_ONLY
-            )
-        )
-    ],
+    null,
+    null,
     new ProvisionedThroughput(10, 5)
-);
+    );
 
-$dynamoDbClientOptions = [];
-$dynamoDbClient = new DynamoDbClient($dynamoDbClientOptions);
-$result = $dynamoDbClient->createTable($createTable->toArray());
+$result = $dynamoDb->createTable($createTable->toArray());
 
 print_r($result);
 ```
